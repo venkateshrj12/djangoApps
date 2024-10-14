@@ -8,13 +8,17 @@ def courses(request):
         'learn': ['flask', 'django']
     }
     if request.method == 'GET':
+        name = request.GET.get('name')
         response = {'message': 'You hit GET request',
-                    'courses': courses }
+                    'courses': courses,
+                     'name': name }
     elif request.method == 'POST':
+        data = request.data
         response = {'message': 'You hit POST request',
-                    'courses': courses }
+                    'data': data }
     elif request.method == 'PATCH':
+        data = request.data
         response = {'message': 'You hit Patch request',
-                    'courses': courses }
+                    'data': data }
 
     return Response(response)

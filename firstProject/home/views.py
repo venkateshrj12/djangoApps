@@ -29,14 +29,14 @@ def courses(request):
 
     return Response(response)
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 def people(request):
     if request.method == 'GET':
         objs = Person.objects.all()
         serializer = PeopleSerializer(objs, many = True)
         return Response(serializer.data)
     
-    else:
+    elif request.method == 'POST':
         data = request.data
         serializer = PeopleSerializer(data = data)
         if serializer.is_valid():
@@ -44,6 +44,12 @@ def people(request):
             return Response(serializer.data)
         
         return Response(serializer.errors)
+    
+    else:
+        id = request.data['id']
+        obj = get_object_or_404(Person, id = id)
+        obj.delete()
+        return Response({'message': 'success'}, status=status.HTTP_204_NO_CONTENT)
     
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def  person(request, id):

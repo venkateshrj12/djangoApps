@@ -131,7 +131,3 @@ class BookAPI(APIView):
         book.delete()
         return Response({'message': 'success'})
     
-
-
-        
-        

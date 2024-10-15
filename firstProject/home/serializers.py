@@ -10,6 +10,7 @@ class ColorSerializer(serializers.ModelSerializer):
 
 class PeopleSerializer(serializers.ModelSerializer):
     color = serializers.PrimaryKeyRelatedField(queryset=Color.objects.all(), required= False)
+    greetings = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
@@ -22,6 +23,9 @@ class PeopleSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['color'] = ColorSerializer(instance.color).data if response['color'] else None
         return response
+
+    def get_greetings(self, instance):
+        return f'Hello, {instance.name}!'
 
 # validations for serializers
     # def validate(self, data):

@@ -32,7 +32,9 @@ def courses(request):
 @api_view(['GET', 'POST', 'DELETE'])
 def people(request):
     if request.method == 'GET':
-        objs = Person.objects.all()
+        # objs = Person.objects.all()
+        objs = Person.objects.filter(color__isnull = False) # filtering the values based on color selection
+
         serializer = PeopleSerializer(objs, many = True)
         return Response(serializer.data)
     

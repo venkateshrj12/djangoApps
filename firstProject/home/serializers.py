@@ -9,6 +9,8 @@ class PeopleSerializer(serializers.ModelSerializer):
         # fields = ['name', 'age', ]
         # exclude = ['name', 'age',]
         fields = '__all__'
+        depth = 1 # to include nested fields
+
 
     # def validate(self, data):
     #     if 'age' in data and data['age'] < 18:

@@ -1,5 +1,11 @@
-from django.urls import path, re_path
-from home.views import not_fuond, courses, people, person, login, BookAPI
+from django.urls import path, re_path, include
+from home.views import not_fuond, courses, people, person, login, BookAPI, BookViewSet
+
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'books', BookViewSet, basename='books')
+urlpatterns = router.urls
 
 urlpatterns = [
     # api view decorators
@@ -9,7 +15,10 @@ urlpatterns = [
     path('login/', login),
 
     # API view class
-    path('books/', BookAPI.as_view()),
+    path('book/', BookAPI.as_view()),
+
+    # API ViewSet Class
+    path('', include(router.urls)),
 
     # Catch-all route for 404
     re_path(r'^.*$', not_fuond),

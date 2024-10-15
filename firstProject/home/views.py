@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
-from home.models import Person
-from home.serializers import PeopleSerializer, LoginSerializer
+from home.models import Person, Book
+from home.serializers import PeopleSerializer, LoginSerializer, BookSerializer
 import pdb
 
 @api_view(['GET', 'POST', 'PATCH'])
@@ -91,3 +92,46 @@ def login(request):
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def not_fuond(request):
     return Response('Page not found', status=status.HTTP_404_NOT_FOUND)
+
+class BookAPI(APIView):
+    def get(self, request):
+        objs = Book.objects.all()
+        serializer = BookSerializer(objs, many = True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        data = request.data
+        serializer = BookSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def patch(self, request):
+        data = request.data
+        book = get_object_or_404(Book, id = data['id'])
+        serializer = BookSerializer(book, data = data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def put(self, request):
+        data = request.data
+        book = get_object_or_404(Book, id = data['id'])
+        serializer = BookSerializer(book, data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def delete(self, request):
+        id = request.data['data']
+        book  = get_object_or_404(Book, id = id)
+        book.delete()
+        return Response({'message': 'success'})
+    
+
+
+        
+        

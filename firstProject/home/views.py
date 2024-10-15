@@ -134,3 +134,27 @@ class BookAPI(APIView):
 class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all()
+
+    def list(self, request):
+        search = request.GET.get('search')
+        pdb.set_trace()
+    
+        queryset = self.queryset.filter(name__contains = search) if search else self.queryset
+        serializer = self.serializer_class(queryset, many = True)
+        return Response(serializer.data)
+
+    def  create(self, request):
+        data = request.data
+        serializer = self.serializer_class(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return  Response(serializer.errors)
+    
+    def  retrieve(self, request, pk = None):
+        queryset = self.queryset
+        book = get_object_or_404(queryset, pk = pk)
+        serializer = self.serializer_class(book)
+        return Response(serializer.data)
+    
+          

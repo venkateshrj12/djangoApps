@@ -87,3 +87,7 @@ def login(request):
         return Response({'message': 'success'})
 
     return Response(serializer.errors)
+
+@api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+def not_fuond(request):
+    return Response('Page not found', status=status.HTTP_404_NOT_FOUND)

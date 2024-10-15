@@ -48,3 +48,7 @@ class PeopleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Name should not contain special characters')
         
         return name
+    
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()

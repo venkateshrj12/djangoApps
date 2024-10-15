@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from home.models import Person
-from home.serializers import PeopleSerializer
+from home.serializers import PeopleSerializer, LoginSerializer
 import pdb
 
 @api_view(['GET', 'POST', 'PATCH'])
@@ -78,3 +78,12 @@ def  person(request, id):
     elif request.method == 'DELETE':
         obj.delete()
         return Response({'message': 'success'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def login(request):
+    data = request.data
+    serializer = LoginSerializer(data = data)
+    if serializer.is_valid():
+        return Response({'message': 'success'})
+
+    return Response(serializer.errors)

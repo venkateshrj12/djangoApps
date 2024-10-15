@@ -1,15 +1,20 @@
 from rest_framework import serializers
-from home.models import Person
+from home.models import Person, Color
 import re
 
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Color
+        fields = ['color_name']
+
 class PeopleSerializer(serializers.ModelSerializer):
-    
+    color = ColorSerializer()
     class Meta:
         model = Person
         # fields = ['name', 'age', ]
         # exclude = ['name', 'age',]
         fields = '__all__'
-        depth = 1 # to include nested fields
+        # depth = 1 # to include nested fields
 
 
     # def validate(self, data):

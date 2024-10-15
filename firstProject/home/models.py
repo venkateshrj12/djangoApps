@@ -13,3 +13,11 @@ class Person(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+class Book(models.Model):
+    name = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    published = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.name

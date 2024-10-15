@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from home.models import Person, Color
+from home.models import Person, Color, Book
 import re
 import pdb
 
@@ -49,6 +49,11 @@ class PeopleSerializer(serializers.ModelSerializer):
         
         return name
     
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = '__all__'
+        
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()

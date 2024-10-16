@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from home.models import Person, Book
 from home.serializers import * # PeopleSerializer, LoginSerializer, BookSerializer, RegisterUserSerializer
@@ -104,10 +106,13 @@ def not_fuond(request):
     return Response('Page not found', status=status.HTTP_404_NOT_FOUND)
 
 class BookAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     def get(self, request):
+        current_user = request.user
         objs = Book.objects.all()
         serializer = BookSerializer(objs, many = True)
-        return Response(serializer.data)
+        return Response({'data': serializer.data, 'current_user': str(current_user)})
     
     def post(self, request):
         data = request.data
@@ -147,7 +152,6 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         search = request.GET.get('search')
-        pdb.set_trace()
     
         queryset = self.queryset.filter(name__contains = search) if search else self.queryset
         serializer = self.serializer_class(queryset, many = True)

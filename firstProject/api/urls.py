@@ -1,5 +1,5 @@
 from django.urls import path, re_path, include
-from home.views import not_fuond, courses, people, person, login, BookAPI, BookViewSet
+from home.views import not_fuond, courses, people, person, login, BookAPI, BookViewSet, RegisterUser
 
 from rest_framework.routers import DefaultRouter
 
@@ -16,6 +16,7 @@ urlpatterns = [
 
     # API view class
     path('book/', BookAPI.as_view()),
+    path('signup/', RegisterUser.as_view()),
 
     # API ViewSet Class
     path('', include(router.urls)),

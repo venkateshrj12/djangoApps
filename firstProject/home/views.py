@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 from home.models import Person, Book
-from home.serializers import PeopleSerializer, LoginSerializer, BookSerializer
+from home.serializers import * # PeopleSerializer, LoginSerializer, BookSerializer, RegisterUserSerializer
 import pdb
 
 @api_view(['GET', 'POST', 'PATCH'])
@@ -156,5 +157,13 @@ class BookViewSet(viewsets.ModelViewSet):
         book = get_object_or_404(queryset, pk = pk)
         serializer = self.serializer_class(book)
         return Response(serializer.data)
-    
-          
+
+class RegisterUser(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = RegisterUserSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)

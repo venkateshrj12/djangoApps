@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from home.models import Person, Color, Book
+from django.contrib.auth.models import User
 import re
 import pdb
 
@@ -57,3 +58,60 @@ class BookSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+
+class RegisterUserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=100)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(write_only=True) # if we use write_only = True, it will not be included in the response
+
+    def validate(self, data):
+        username = data.get('username', '')
+        email = data.get('email', '')
+        password = data['password']
+
+        if User.objects.filter(username = username).exists():
+            raise serializers.ValidationError({'username': 'Username already exists'})
+
+        if User.objects.filter(email = email).exists():
+            raise serializers.ValidationError({'email': "Email has been taken"})
+
+        if len(password) < 8:
+            raise serializers.ValidationError({'password': 'Password should be greater than 8 characters'})
+        
+        return data
+
+    # def validate_uesrname(self, username):
+    #     if User.objects.filter(username = username).exists():
+    #         raise serializers.ValidationError('Username already exists')
+    #     return username
+        
+    # def validate_email(self, email):
+    #     if User.objects.filter(email = email).exists():
+    #         raise serializers.ValidationError("Email has been taken")
+    #     return email
+    
+    # def  validate_password(self, password):
+    #     if len(password) < 8:
+    #         raise serializers.ValidationError('Password should be greater than 8 characters')
+    #     return password
+
+    def create(self, validated_data):
+        username = validated_data.get('username', '')
+        email = validated_data.get('email', '')
+        password = validated_data['password']
+
+        # user = User.objects.create(
+        #     username = username,
+        #     email = email,
+        #     password = password
+        # ) #  this will create a new user in the database without password
+
+        user = User.objects.create(
+            username = username,
+            email = email
+        )
+        user.set_password(password) # if we use set_password(password) method, it will hash the password
+        user.save()
+
+        return user
+

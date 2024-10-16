@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
 from django.shortcuts import get_object_or_404
@@ -8,6 +9,8 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from django.core.paginator import  Paginator, EmptyPage, PageNotAnInteger
+
 
 from home.models import Person, Book
 from home.serializers import * # PeopleSerializer, LoginSerializer, BookSerializer, RegisterUserSerializer
@@ -108,11 +111,41 @@ def not_fuond(request):
 class BookAPI(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+
     def get(self, request):
         current_user = request.user
         objs = Book.objects.all()
-        serializer = BookSerializer(objs, many = True)
-        return Response({'data': serializer.data, 'current_user': str(current_user)})
+
+        # Get page_number and handle ValueError
+        try:
+            page_number = int(request.GET.get('page_number', 1))
+        except ValueError:
+            page_number = 1
+        
+        # Get page_size and handle ValueError
+        try:
+            page_size = int(request.GET.get('page_size', 20))
+        except ValueError:
+            page_size = 20
+
+        paginator = Paginator(objs, page_size)
+
+        try:
+            books = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            books = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range, return an empty list.
+            books = []
+
+        serializer = BookSerializer(books, many=True)
+        return Response({
+            'data': serializer.data, 
+            'current_user': str(current_user),
+            'total_pages': paginator.num_pages,
+            'current_page': page_number
+        })
     
     def post(self, request):
         data = request.data

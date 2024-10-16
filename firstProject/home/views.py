@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
@@ -184,25 +184,44 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
 
     def list(self, request):
-        search = request.GET.get('search')
+        search = request.GET.get('search', '')
     
-        queryset = self.queryset.filter(name__contains = search) if search else self.queryset
-        serializer = self.serializer_class(queryset, many = True)
+        queryset = self.queryset.filter(name__icontains=search) if search else self.queryset
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-    def  create(self, request):
+    def create(self, request):
         data = request.data
-        serializer = self.serializer_class(data = data)
+        serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return  Response(serializer.errors)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def  retrieve(self, request, pk = None):
+    def retrieve(self, request, pk=None):
         queryset = self.queryset
-        book = get_object_or_404(queryset, pk = pk)
+        book = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(book)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'])
+    def search(self, request):
+        query = request.GET.get('query', '')
+    
+        queryset = self.queryset.filter(name__icontains=query) if query else self.queryset
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['POST'])
+    def publish(self, request,  pk=None):
+        book = self.get_object()
+        book.published = True
+        book.save()
+        serializer = self.serializer_class(book)
+        return Response(serializer.data)
+
+
+
 
 class RegisterUser(APIView):
     def post(self, request):

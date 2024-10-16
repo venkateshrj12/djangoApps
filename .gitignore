@@ -1,12 +1,12 @@
 # created by virtualenv automatically
-__pycache__/
+*__pycache__*/
 *.py[cod]
 *$py.class
 
 # Django stuff:
 *.log
 *.pot
-*.pyc
+*.pyc*
 db.sqlite3
 .Python
 # Ignore cache files

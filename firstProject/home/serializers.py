@@ -56,7 +56,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.CharField()
     password = serializers.CharField()
 
 class RegisterUserSerializer(serializers.Serializer):

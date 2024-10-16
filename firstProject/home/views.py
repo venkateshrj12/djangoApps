@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from rest_framework import status, viewsets
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
 from home.models import Person, Book
 from home.serializers import * # PeopleSerializer, LoginSerializer, BookSerializer, RegisterUserSerializer
@@ -86,9 +88,16 @@ def login(request):
     data = request.data
     serializer = LoginSerializer(data = data)
     if serializer.is_valid():
-        return Response({'message': 'success'})
+        username = serializer.data['username']
+        password = serializer.data['password']
+        user = authenticate(username = username, password = password)
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'user': RegisterUserSerializer(user).data, 'token': str(token)})
+        else:
+            return Response({'errors': ['Invalid Credentials']}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def not_fuond(request):

@@ -8,7 +8,7 @@ class SignupSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, style={'input_type': 'password'})
     class Meta:
         model = User
-        fields = ('email', 'name', 'avatar', 'password1', 'password2')
+        fields = ('id','email', 'name', 'avatar', 'password1', 'password2')
         
     def create(self, validated_data):
         # Remove password2 since we don't need to save it

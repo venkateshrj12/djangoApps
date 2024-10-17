@@ -44,3 +44,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['name'] # used only for super_user
+
+    class Meta:
+        ordering = ['date_joined']
